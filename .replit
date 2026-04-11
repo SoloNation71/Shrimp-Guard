@@ -6,9 +6,9 @@ expertMode = true
 channel = "stable-25_05"
 
 [deployment]
-deploymentTarget = "autoscale"
-run = ["node", "./dist/index.cjs"]
-build = ["npm", "run", "build"]
+deploymentTarget = "cloudrun"
+run = ["sh", "-c", "start"]
+build = ["sh", "-c", "comp"]
 
 [workflows]
 runButton = "Project"
