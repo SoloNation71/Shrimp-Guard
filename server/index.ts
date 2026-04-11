@@ -6,6 +6,8 @@ import { errorHandler, notFound } from './middleware/errorHandler.js';
 import sensorsRouter from './routes/sensors.js';
 import streamsRouter from './routes/streams.js';
 import manualEntryRouter from './routes/manualEntry.js';
+import ingestRouter from './routes/ingest.js';
+import devicesRouter from './routes/devices.js';
 
 const PORT = Number(process.env.API_PORT ?? 3001);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5000';
@@ -27,7 +29,7 @@ app.use(
     origin: isDev ? true : CLIENT_ORIGIN,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Device-Key'],
   })
 );
 
@@ -48,6 +50,8 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/sensors', sensorsRouter);
 app.use('/api/stream', streamsRouter);
 app.use('/api/manual-entry', manualEntryRouter);
+app.use('/api/ingest', ingestRouter);
+app.use('/api/devices', devicesRouter);
 
 app.use(notFound);
 app.use(errorHandler);

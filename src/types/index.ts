@@ -61,6 +61,18 @@ export interface User {
   role: UserRole;
 }
 
+export interface Device {
+  id: string;
+  name: string;
+  type: 'arduino' | 'raspberry_pi';
+  pond_id: number;
+  key?: string;        // Only present immediately after creation
+  key_preview: string;
+  created_at: string;
+  last_seen: string | null;
+  last_reading: Record<string, number> | null;
+}
+
 export interface NotificationPreferences {
   emailAlerts: boolean;
   smsAlerts: boolean;
