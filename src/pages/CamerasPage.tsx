@@ -1,7 +1,9 @@
 import { AnnkePlayer } from '@/components/AnnkePlayer';
-import { MOCK_PONDS } from '@/api/mock-data';
+import { usePonds } from '@/context/PondsContext';
 
 export default function CamerasPage() {
+  const { ponds } = usePonds();
+
   return (
     <div className="space-y-4">
       <div>
@@ -11,7 +13,7 @@ export default function CamerasPage() {
         </p>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        {MOCK_PONDS.map((pond) => (
+        {ponds.map((pond) => (
           <AnnkePlayer
             key={pond.id}
             pondId={pond.id}

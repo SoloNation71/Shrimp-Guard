@@ -1,4 +1,4 @@
-import { MOCK_PONDS } from '@/api/mock-data';
+import { usePonds } from '@/context/PondsContext';
 import { cn } from '@/lib/utils';
 
 interface PondSelectorProps {
@@ -13,12 +13,15 @@ const STATUS_DOT = {
 };
 
 export function PondSelector({ selectedPondId, onChange }: PondSelectorProps) {
+  const { ponds } = usePonds();
+
   return (
     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-      {MOCK_PONDS.map((pond) => (
+      {ponds.map((pond) => (
         <button
           key={pond.id}
           onClick={() => onChange(pond.id)}
+          data-testid={`button-pond-${pond.id}`}
           className={cn(
             'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium whitespace-nowrap transition-all',
             selectedPondId === pond.id

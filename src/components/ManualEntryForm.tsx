@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { MOCK_PONDS } from '@/api/mock-data';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { usePonds } from '@/context/PondsContext';
 import { submitManualEntry } from '@/api/manualEntry';
 import { useMutation } from '@tanstack/react-query';
 import { Loader2, WifiOff } from 'lucide-react';
@@ -38,10 +38,12 @@ function saveQueue(queue: ManualEntry[]) {
 
 export function ManualEntryForm() {
   const { user } = useAuth();
-  const [pondId, setPondId] = useState(1);
+  const { ponds, getPond } = usePonds();
+
+  const [pondId, setPondId] = useState<number>(ponds[0]?.id ?? 1);
   const [values, setValues] = useState<Partial<Record<FieldKey, string>>>({});
   const [notes, setNotes] = useState('');
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [isOffline] = useState(!navigator.onLine);
   const [queueCount, setQueueCount] = useState(() => loadQueue().length);
 
   const isViewer = user?.role === 'viewer';
@@ -49,8 +51,9 @@ export function ManualEntryForm() {
   const mutation = useMutation({
     mutationFn: (entry: ManualEntry) => submitManualEntry(entry),
     onSuccess: () => {
+      const pondName = getPond(pondId)?.name ?? `Pond ${pondId}`;
       toast.success('Reading submitted successfully', {
-        description: `${MOCK_PONDS.find((p) => p.id === pondId)?.name} manual entry recorded.`,
+        description: `${pondName} manual entry recorded.`,
       });
       setValues({});
       setNotes('');
@@ -89,7 +92,7 @@ export function ManualEntryForm() {
     saveQueue(queue);
     setQueueCount(queue.length);
     toast('Queued for later', {
-      description: `Stored offline. Will sync when connection restores.`,
+      description: 'Stored offline. Will sync when connection restores.',
     });
     setValues({});
     setNotes('');
@@ -138,7 +141,9 @@ export function ManualEntryForm() {
         <div className="flex items-center justify-between rounded-lg border border-warning/40 bg-warning/10 px-4 py-2">
           <div className="flex items-center gap-2 text-sm text-warning-foreground">
             <WifiOff className="h-4 w-4" />
-            <span>{queueCount} reading{queueCount !== 1 ? 's' : ''} queued offline</span>
+            <span>
+              {queueCount} reading{queueCount !== 1 ? 's' : ''} queued offline
+            </span>
           </div>
           <Button
             type="button"
@@ -158,7 +163,9 @@ export function ManualEntryForm() {
         data-testid="manual-entry-form"
       >
         <div>
-          <Label htmlFor="pond-select" className="text-sm font-medium">Pond</Label>
+          <Label htmlFor="pond-select" className="text-sm font-medium">
+            Pond
+          </Label>
           <select
             id="pond-select"
             data-testid="select-pond"
@@ -166,8 +173,10 @@ export function ManualEntryForm() {
             onChange={(e) => setPondId(Number(e.target.value))}
             className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
           >
-            {MOCK_PONDS.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+            {ponds.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
             ))}
           </select>
         </div>
@@ -175,7 +184,9 @@ export function ManualEntryForm() {
         <div className="grid grid-cols-2 gap-3">
           {FIELDS.map((f) => (
             <div key={f.key}>
-              <Label htmlFor={f.key} className="text-xs">{f.label}</Label>
+              <Label htmlFor={f.key} className="text-xs">
+                {f.label}
+              </Label>
               <Input
                 id={f.key}
                 data-testid={`input-${f.key}`}
@@ -183,9 +194,7 @@ export function ManualEntryForm() {
                 step="any"
                 placeholder={f.placeholder}
                 value={values[f.key] ?? ''}
-                onChange={(e) =>
-                  setValues((v) => ({ ...v, [f.key]: e.target.value }))
-                }
+                onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
                 className="mt-1"
               />
             </div>
@@ -193,7 +202,9 @@ export function ManualEntryForm() {
         </div>
 
         <div>
-          <Label htmlFor="notes" className="text-xs">Notes</Label>
+          <Label htmlFor="notes" className="text-xs">
+            Notes
+          </Label>
           <Textarea
             id="notes"
             data-testid="input-notes"
@@ -212,7 +223,10 @@ export function ManualEntryForm() {
           data-testid="button-submit"
         >
           {mutation.isPending ? (
-            <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting…</>
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Submitting…
+            </>
           ) : isOffline ? (
             'Queue Offline'
           ) : (

@@ -3,10 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MOCK_PONDS } from '@/api/mock-data';
+import { usePonds } from '@/context/PondsContext';
 import { Pencil, Check, X, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { usePersistedState } from '@/hooks/usePersistedState';
 import type { Pond, PondThresholds } from '@/types';
 
 const DEFAULT_THRESHOLDS: PondThresholds = {
@@ -19,9 +18,13 @@ const DEFAULT_THRESHOLDS: PondThresholds = {
 };
 
 export function PondSettingsTab() {
-  const [ponds, setPonds] = usePersistedState<Pond[]>('shrimpguard:ponds', [...MOCK_PONDS]);
+  const { ponds, setPonds } = usePonds();
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<{ name: string; location: string; thresholds: PondThresholds } | null>(null);
+  const [editForm, setEditForm] = useState<{
+    name: string;
+    location: string;
+    thresholds: PondThresholds;
+  } | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [newPond, setNewPond] = useState({ name: '', location: '' });
 
@@ -43,7 +46,12 @@ export function PondSettingsTab() {
     setPonds((prev) =>
       prev.map((p) =>
         p.id === editingId
-          ? { ...p, name: editForm.name.trim(), location: editForm.location.trim(), thresholds: editForm.thresholds }
+          ? {
+              ...p,
+              name: editForm.name.trim(),
+              location: editForm.location.trim(),
+              thresholds: editForm.thresholds,
+            }
           : p
       )
     );
@@ -95,7 +103,10 @@ export function PondSettingsTab() {
       ...editForm,
       thresholds: {
         ...editForm.thresholds,
-        [field]: { ...(editForm.thresholds as Record<string, unknown>)[field] as object, [bound]: num },
+        [field]: {
+          ...(editForm.thresholds as Record<string, Record<string, number>>)[field],
+          [bound]: num,
+        },
       },
     });
   };
@@ -135,8 +146,12 @@ export function PondSettingsTab() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button size="sm" onClick={addPond} data-testid="button-confirm-add-pond">Add</Button>
-              <Button size="sm" variant="ghost" onClick={() => setShowAdd(false)}>Cancel</Button>
+              <Button size="sm" onClick={addPond} data-testid="button-confirm-add-pond">
+                Add
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setShowAdd(false)}>
+                Cancel
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -224,7 +239,11 @@ export function PondSettingsTab() {
                           type="number"
                           step="0.1"
                           placeholder="Min"
-                          value={((editForm.thresholds as Record<string, Record<string, number>>)[key])?.min ?? ''}
+                          value={
+                            (
+                              editForm.thresholds as Record<string, Record<string, number>>
+                            )[key]?.min ?? ''
+                          }
                           onChange={(e) => updateThreshold(key, 'min', e.target.value)}
                           className="text-xs h-8"
                         />
@@ -233,7 +252,11 @@ export function PondSettingsTab() {
                         type="number"
                         step="0.1"
                         placeholder="Max"
-                        value={((editForm.thresholds as Record<string, Record<string, number>>)[key])?.max ?? ''}
+                        value={
+                          (
+                            editForm.thresholds as Record<string, Record<string, number>>
+                          )[key]?.max ?? ''
+                        }
                         onChange={(e) => updateThreshold(key, 'max', e.target.value)}
                         className="text-xs h-8"
                       />
