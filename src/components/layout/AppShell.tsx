@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Waves, Menu, X } from 'lucide-react';
+import { LogOut, Waves, Menu, X, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: 'Cameras', path: '/cameras' },
   { label: 'Alerts', path: '/alerts' },
   { label: 'Manual Entry', path: '/manual-entry' },
+  { label: 'Settings', path: '/settings', ownerOnly: true },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -40,7 +41,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {NAV_ITEMS.map((item) => (
+            {NAV_ITEMS.filter(item => !item.ownerOnly || user?.role === 'owner').map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -69,7 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Mobile Nav */}
         {mobileMenuOpen && (
           <nav className="md:hidden border-t bg-card animate-slide-up">
-            {NAV_ITEMS.map((item) => (
+            {NAV_ITEMS.filter(item => !item.ownerOnly || user?.role === 'owner').map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
