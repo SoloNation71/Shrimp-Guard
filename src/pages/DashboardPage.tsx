@@ -73,7 +73,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-4">
-          <AnnkePlayer label={`${pond?.name} Camera`} />
+          <AnnkePlayer pondId={selectedPond} label={`${pond?.name} Camera`} />
           <AlertsPanel pondFilter={selectedPond} />
         </div>
       </div>
