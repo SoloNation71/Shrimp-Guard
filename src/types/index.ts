@@ -10,12 +10,22 @@ export interface SensorReading {
   turbidity: number;         // NTU
 }
 
+export interface PondThresholds {
+  temperature: { min: number; max: number };
+  ph: { min: number; max: number };
+  dissolved_oxygen: { min: number; max: number };
+  ammonia: { max: number };
+  salinity: { min: number; max: number };
+  turbidity: { max: number };
+}
+
 export interface Pond {
   id: number;
   name: string;
   location: string;
   status: 'healthy' | 'warning' | 'critical';
   camera_stream_url?: string;
+  thresholds: PondThresholds;
 }
 
 export interface Alert {
@@ -49,4 +59,13 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+}
+
+export interface NotificationPreferences {
+  emailAlerts: boolean;
+  smsAlerts: boolean;
+  criticalOnly: boolean;
+  quietHoursEnabled: boolean;
+  quietHoursStart: string;
+  quietHoursEnd: string;
 }
