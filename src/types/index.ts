@@ -1,0 +1,52 @@
+export interface SensorReading {
+  id: string;
+  pond_id: number;
+  timestamp: string;
+  temperature: number;      // °F
+  ph: number;               // 0–14
+  dissolved_oxygen: number;  // mg/L
+  ammonia: number;           // ppm
+  salinity: number;          // ppt
+  turbidity: number;         // NTU
+}
+
+export interface Pond {
+  id: number;
+  name: string;
+  location: string;
+  status: 'healthy' | 'warning' | 'critical';
+  camera_stream_url?: string;
+}
+
+export interface Alert {
+  id: string;
+  pond_id: number;
+  type: 'warning' | 'critical';
+  parameter: string;
+  message: string;
+  value: number;
+  threshold: number;
+  timestamp: string;
+  acknowledged: boolean;
+}
+
+export interface ManualEntry {
+  pond_id: number;
+  temperature?: number;
+  ph?: number;
+  dissolved_oxygen?: number;
+  ammonia?: number;
+  salinity?: number;
+  turbidity?: number;
+  notes?: string;
+  timestamp: string;
+}
+
+export type UserRole = 'owner' | 'viewer';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+}
