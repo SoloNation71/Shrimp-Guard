@@ -1,10 +1,19 @@
 import type { SensorReading, Pond, Alert } from '@/types';
 
+const DEFAULT_THRESHOLDS = {
+  temperature: { min: 75, max: 84 },
+  ph: { min: 6.5, max: 8.5 },
+  dissolved_oxygen: { min: 5, max: 10 },
+  ammonia: { max: 0.1 },
+  salinity: { min: 10, max: 25 },
+  turbidity: { max: 25 },
+};
+
 export const MOCK_PONDS: Pond[] = [
-  { id: 1, name: 'Pond Alpha', location: 'North Greenhouse', status: 'healthy' },
-  { id: 2, name: 'Pond Beta', location: 'South Greenhouse', status: 'warning' },
-  { id: 3, name: 'Pond Gamma', location: 'Outdoor East', status: 'healthy' },
-  { id: 4, name: 'Pond Delta', location: 'Outdoor West', status: 'critical' },
+  { id: 1, name: 'Pond Alpha', location: 'North Greenhouse', status: 'healthy', thresholds: { ...DEFAULT_THRESHOLDS } },
+  { id: 2, name: 'Pond Beta', location: 'South Greenhouse', status: 'warning', thresholds: { ...DEFAULT_THRESHOLDS } },
+  { id: 3, name: 'Pond Gamma', location: 'Outdoor East', status: 'healthy', thresholds: { ...DEFAULT_THRESHOLDS } },
+  { id: 4, name: 'Pond Delta', location: 'Outdoor West', status: 'critical', thresholds: { ...DEFAULT_THRESHOLDS } },
 ];
 
 function generateReading(pondId: number, timestamp: Date): SensorReading {

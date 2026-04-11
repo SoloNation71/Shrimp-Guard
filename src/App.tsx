@@ -10,6 +10,7 @@ import DashboardPage from "./pages/DashboardPage";
 import CamerasPage from "./pages/CamerasPage";
 import AlertsPage from "./pages/AlertsPage";
 import ManualEntryPage from "./pages/ManualEntryPage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ function ProtectedRoutes() {
         <Route path="/cameras" element={<CamerasPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
         <Route path="/manual-entry" element={<ManualEntryPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AppShell>
