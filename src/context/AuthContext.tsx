@@ -9,6 +9,7 @@ interface AuthState {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (patch: Partial<Pick<User, 'name' | 'email'>>) => void;
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -102,9 +103,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(null);
   }, []);
 
+  const updateUser = useCallback((patch: Partial<Pick<User, 'name' | 'email'>>) => {
+    setUser((prev) => (prev ? { ...prev, ...patch } : prev));
+  }, []);
+
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, isAuthenticated: !!user, isLoading, login, logout }}
+      value={{ user, accessToken, isAuthenticated: !!user, isLoading, login, logout, updateUser }}
     >
       {children}
     </AuthContext.Provider>
