@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Waves, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('owner@shrimpguard.com');
   const [password, setPassword] = useState('demo1234');
   const [error, setError] = useState('');
+
+  if (isAuthenticated) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
