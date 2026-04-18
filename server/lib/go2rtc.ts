@@ -67,8 +67,14 @@ export async function listStreams(): Promise<string[]> {
     headers['Authorization'] = `Bearer ${GO2RTC_API_KEY}`;
   }
 
-  const res = await fetch(`${GO2RTC_BASE}/api/streams`, { headers });
-  if (!res.ok) throw new Error(`Go2RTC error: ${res.status}`);
-  const data: Record<string, unknown> = await res.json();
-  return Object.keys(data);
+  try {
+    const res = await fetch(`${GO2RTC_BASE}/api/streams`, { headers });
+    if (!res.ok) throw new Error(`Go2RTC error: ${res.status}`);
+    const data: Record<string, unknown> = await res.json();
+    return Object.keys(data);
+  } catch (err) {
+    console.warn('[Go2RTC] listStreams demo mode —', err instanceof Error ? err.message : err);
+    // Return placeholder stream names so the UI stays functional without Go2RTC
+    return ['pond_1', 'pond_2', 'pond_3', 'pond_4'];
+  }
 }
