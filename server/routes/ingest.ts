@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import { validateKey, touchDevice } from '../lib/deviceStore.js';
 import { writeManualEntry } from '../lib/influxdb.js';
+import { emitSensorUpdate } from '../lib/socketServer.js';
 
 const router = Router();
 
@@ -12,7 +13,7 @@ const ingestLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   keyGenerator: (req) => {
-    const key = req.headers['x-device-key'];
+    const key = req.headers['x-device-key'] ?? req.headers['x-api-key'];
     return typeof key === 'string' && key ? key : 'anonymous';
   },
   message: { error: 'Device rate limit exceeded — slow down transmission interval' },
@@ -33,8 +34,10 @@ router.post(
   '/',
   ingestLimiter,
   async (req: Request, res: Response, next: NextFunction) => {
-    // Device key auth via X-Device-Key header
-    const deviceKey = req.headers['x-device-key'];
+    const deviceKey =
+      (req.headers['x-device-key'] as string | undefined) ??
+      (req.headers['x-api-key'] as string | undefined);
+
     if (!deviceKey || typeof deviceKey !== 'string') {
       res.status(401).json({ error: 'Missing X-Device-Key header' });
       return;
@@ -54,7 +57,6 @@ router.post(
       return;
     }
 
-    // Extract and validate sensor fields
     const fields: Partial<Record<SensorField, number>> = {};
     for (const field of SENSOR_FIELDS) {
       if (body[field] !== undefined && body[field] !== null && body[field] !== '') {
@@ -82,12 +84,22 @@ router.post(
 
       touchDevice(device.id, { pond_id: pondId, ...fields });
 
+      const timestamp = body.timestamp ?? new Date().toISOString();
+      const payload = {
+        device: device.name,
+        pond_id: pondId,
+        fields,
+        timestamp,
+      };
+
+      emitSensorUpdate(String(pondId), payload);
+
       res.status(201).json({
         ok: true,
         device: device.name,
         pond_id: pondId,
         fields_received: Object.keys(fields),
-        timestamp: body.timestamp ?? new Date().toISOString(),
+        timestamp,
       });
     } catch (err) {
       next(err);

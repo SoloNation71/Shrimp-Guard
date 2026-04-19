@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: 'Cameras', path: '/cameras' },
   { label: 'Alerts', path: '/alerts' },
   { label: 'Manual Entry', path: '/manual-entry' },
+  { label: 'Network', path: '/network' },
   { label: 'Settings', path: '/settings', ownerOnly: true },
 ];
 
